@@ -1,0 +1,13 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+  - pacman: name=ntp state=present
+    when: ansible_distribution == "Archlinux"
+  - yum: name=ntp state=present
+    when: ansible_distribution == "Ubuntu"
+  - copy: src=ntp.conf dest=/etc/ntp.conf
+    notify: restart ntpd
+  handlers:
+   - name: restart ntpd
+     service: name=ntpd state=restarted
