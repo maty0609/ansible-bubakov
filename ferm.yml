@@ -1,0 +1,28 @@
+---
+- hosts: all
+  remote_user: maty
+  tasks:
+  - pacman: name=ferm state=present
+    tags:
+       all
+  - file: path=/etc/ferm state=directory owner=root group=root mode=0700
+    tags:
+       all
+  - file: path=/etc/ferm/ferm.d state=directory owner=root group=root mode=0700
+    tags:
+       all
+  - template: src=ferm.conf dest=/etc/ferm/ferm.conf owner=root group=root
+    tags:
+       all
+  - template: src=ntp_iptables.conf dest=/etc/ferm/ferm.d/ntp.conf owner=root group=root
+    tags:
+      ntp
+  - template: src=ssh_iptables.conf dest=/etc/ferm/ferm.d/ssh.conf owner=root group=root
+    tags:
+       all
+  - command: /usr/sbin/ferm /etc/ferm/ferm.conf
+    tags:
+       all
+  - file: path=/etc/ferm/ferm.d state=absent
+    tags:
+       all
