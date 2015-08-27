@@ -15,6 +15,10 @@
   - template: src=ferm.conf dest=/etc/ferm/ferm.conf owner=root group=root
     tags:
        always
+  - command: cp /etc/ferm/specific_ferm.conf /etc/ferm/ferm.d/
+    ignore_errors: yes
+    tags:
+       always
   - template: src=./ferm_scripts/ssh_log_attack.py dest=/etc/ferm/ssh_log_attack.py owner=root group=root
     tags:
       ssh_deny
