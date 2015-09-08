@@ -12,28 +12,45 @@
   - file: path=/etc/ferm/ferm.d state=directory owner=root group=root mode=0700
     tags:
        always
-  - template: src=ferm.conf dest=/etc/ferm/ferm.conf owner=root group=root
+  - name: Copying ferm.conf
+    template: src=ferm.conf dest=/etc/ferm/ferm.conf owner=root group=root
     tags:
        always
-  - command: cp /etc/ferm/specific_ferm.conf /etc/ferm/ferm.d/
+  - name: Copying host specific rules
+    command: cp /etc/ferm/specific_ferm.conf /etc/ferm/ferm.d/
     ignore_errors: yes
     tags:
        always
-  - template: src=./ferm_scripts/ssh_log_attack.py dest=/etc/ferm/ssh_log_attack.py owner=root group=root
+  - name: (SSH) Copying script for detecting IP addresses
+    template: src=./ferm_scripts/ssh_log_attack.py dest=/etc/ferm/ssh_log_attack.py owner=root group=root
     tags:
       ssh_deny
-  - template: src=./ferm_rules/999_default_fw.conf dest=/etc/ferm/ferm.d/999_default_fw.conf owner=root group=root
+  - name: Copying default FW rules
+    template: src=./ferm_rules/999_default_fw.conf dest=/etc/ferm/ferm.d/999_default_fw.conf owner=root group=root
     tags:
        always
-  - template: src=./ferm_rules/001_ssh_deny_ip.conf dest=/etc/ferm/ferm.d/001_ssh_deny_ip.conf owner=root group=root
+  - name: (SSH_attack) Copying script to drop IP addresses
+    template: src=./ferm_rules/001_ssh_deny_ip.conf dest=/etc/ferm/ferm.d/001_ssh_deny_ip.conf owner=root group=root
     tags:
        ssh_deny
-  - template: src=./ferm_rules/002_ftp_allow.conf dest=/etc/ferm/ferm.d/002_ftp_allow.conf owner=root group=root
+  - name: (FTP) Copying script to allow FTP
+    template: src=./ferm_rules/002_ftp_allow.conf dest=/etc/ferm/ferm.d/002_ftp_allow.conf owner=root group=root
     tags:
        ftp
-  - command: /usr/sbin/ferm --def '$ipv4_address={{ansible_default_ipv4.address}}' /etc/ferm/ferm.conf
+  - name: (OpenVPN) Copying script to allow OpenVPN
+    template: src=./ferm_rules/003_openvpn.conf dest=/etc/ferm/ferm.d/003_openvpn.conf owner=root group=root
+    tags:
+       openvpn
+  - name: (HTTP) Copying script to allow HTTP
+    template: src=./ferm_rules/005_http.conf dest=/etc/ferm/ferm.d/005_http.conf owner=root group=root
+    tags:
+       http
+  - name: FERM is applying rules
+#    command: /usr/sbin/ferm --def '$ipv4_address={{ansible_default_ipv4.address}}' /etc/ferm/ferm.conf
+    command: /usr/sbin/ferm --def '$ipv4_address={{ansible_ssh_host}}' /etc/ferm/ferm.conf
     tags:
        always
-  - file: path=/etc/ferm/ferm.d state=absent
+  - name: Removing temporary files
+    file: path=/etc/ferm/ferm.d state=absent
     tags:
        always
