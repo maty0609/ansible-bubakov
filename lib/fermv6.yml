@@ -17,37 +17,32 @@
     tags:
        always
   - name: Copying host specific rules
-    command: cp /etc/ferm/specific_ferm.conf /etc/ferm/ferm.d/
+    command: cp /etc/ferm/specific_fermv6.conf /etc/ferm/ferm.d/
     ignore_errors: yes
     tags:
        always
-  - name: (SSH) Copying script for detecting IP addresses
-    template: src=./ferm_scripts/ssh_log_attack.py dest=/etc/ferm/ssh_log_attack.py owner=root group=root
-    tags:
-      ssh_deny
   - name: Copying default FW rules
-    template: src=./ferm_rules/ipv4/999_default_fw.conf dest=/etc/ferm/ferm.d/999_default_fw.conf owner=root group=root
+    template: src=./ferm_rules/ipv6/999_default_fw.conf dest=/etc/ferm/ferm.d/999_default_fw.conf owner=root group=root
     tags:
        always
   - name: (SSH_attack) Copying script to drop IP addresses
-    template: src=./ferm_rules/ipv4/001_ssh_deny_ip.conf dest=/etc/ferm/ferm.d/001_ssh_deny_ip.conf owner=root group=root
+    template: src=./ferm_rules/ipv6/001_ssh_deny_ip.conf dest=/etc/ferm/ferm.d/001_ssh_deny_ip.conf owner=root group=root
     tags:
        ssh_deny
   - name: (FTP) Copying script to allow FTP
-    template: src=./ferm_rules/ipv4/002_ftp_allow.conf dest=/etc/ferm/ferm.d/002_ftp_allow.conf owner=root group=root
+    template: src=./ferm_rules/ipv6/002_ftp_allow.conf dest=/etc/ferm/ferm.d/002_ftp_allow.conf owner=root group=root
     tags:
        ftp
   - name: (OpenVPN) Copying script to allow OpenVPN
-    template: src=./ferm_rules/ipv4/003_openvpn.conf dest=/etc/ferm/ferm.d/003_openvpn.conf owner=root group=root
+    template: src=./ferm_rules/ipv6/003_openvpn.conf dest=/etc/ferm/ferm.d/003_openvpn.conf owner=root group=root
     tags:
        openvpn
   - name: (HTTP) Copying script to allow HTTP
-    template: src=./ferm_rules/ipv4/005_http.conf dest=/etc/ferm/ferm.d/005_http.conf owner=root group=root
+    template: src=./ferm_rules/ipv6/005_http.conf dest=/etc/ferm/ferm.d/005_http.conf owner=root group=root
     tags:
        http
   - name: FERM is applying rules
-#    command: /usr/sbin/ferm --def '$ipv4_address={{ansible_default_ipv4.address}}' /etc/ferm/ferm.conf
-    command: /usr/sbin/ferm --domain ip --def '$ipv4_address={{ansible_local.specific.outside.ipv4}}' --def '$ipv6_address={{ansible_local.specific.outside.ipv6}}' /etc/ferm/ferm.conf
+    command: /usr/sbin/ferm --domain ip6 --def '$ipv6_address={{ansible_local.specific.outside.ipv6}}' /etc/ferm/ferm.conf
     tags:
        always
   - name: Removing temporary files
