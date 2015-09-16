@@ -41,6 +41,10 @@
     template: src=./ferm_rules/ipv6/005_http.conf dest=/etc/ferm/ferm.d/005_http.conf owner=root group=root
     tags:
        http
+  - name: (NTP) Copying script to allow NTP
+    template: src=./ferm_rules/ipv6/004_ntp.conf dest=/etc/ferm/ferm.d/004_ntp.conf owner=root group=root
+    tags:
+       ntp
   - name: FERM is applying rules
     command: /usr/sbin/ferm --domain ip6 --def '$ipv6_address={{ansible_local.specific.outside.ipv6}}' /etc/ferm/ferm.conf
     tags:
